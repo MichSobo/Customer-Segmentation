@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import argparse
 sys.path.append(os.path.abspath('scripts'))
 
 import numpy as np
@@ -22,6 +23,11 @@ def save_stats(df, file_num):
     df.columns = ['_'.join(column).rstrip('_') for column in df.columns.values]
     df.to_parquet(os.path.join(settings['results_folderpath'], target_filename))
 
+
+# Get command-line options
+parser = argparse.ArgumentParser(
+    description='Get some customer data and process it.'
+)
 
 config_filepath = 'config.json'
 
