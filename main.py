@@ -30,6 +30,12 @@ global settings
 with open(config_filepath) as f:
     settings = json.load(f)
 
+# Create raw data folder if not exists
+os.makedirs(settings['raw_folderpath'], exist_ok=True)
+
+# Create results folder if not exists
+os.makedirs(settings['results_folderpath'], exist_ok=True)
+
 # Download and unpack the dataset to
 retrieve(settings)
 print('Raw data files were successfully retrieved.')
