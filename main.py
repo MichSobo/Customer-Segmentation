@@ -29,7 +29,10 @@ parser = argparse.ArgumentParser(
     description='Get some customer data and process it.'
 )
 parser.add_argument('-cfg', '--config', default='config.json',
-                    help='path to the configuration file (default config.json)')
+                    help='path to the configuration file (default: config.json)')
+parser.add_argument('-o', '--option', default='all',
+                    choices=['retrieve', 'visualize', 'save', 'all'],
+                    help='action to run (default: all)')
 args = parser.parse_args()
 
 config_filepath = 'config.json'
