@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 sys.path.append(os.path.abspath('scripts'))
 
 import numpy as np
@@ -22,8 +23,12 @@ def save_stats(df, file_num):
     df.to_parquet(os.path.join('results', target_filename))
 
 
-repo_url = 'https://github.com/oreillymedia/doing_data_science/'
-file_url = 'raw/master/dds_datasets.zip'
+config_filepath = 'config.json'
+
+# Read configuration file
+global settings
+with open(config_filepath) as f:
+    settings = json.load(f)
 
 # Download and unpack the dataset to
 destination_folderpath = 'raw_data'
