@@ -20,7 +20,7 @@ def save_stats(df, file_num):
     target_filename = 'nyt_summary_' + str(file_num + 1) + '.parquet'
 
     df.columns = ['_'.join(column).rstrip('_') for column in df.columns.values]
-    df.to_parquet(os.path.join('results', target_filename))
+    df.to_parquet(os.path.join(settings['results_folderpath'], target_filename))
 
 
 config_filepath = 'config.json'
@@ -31,19 +31,15 @@ with open(config_filepath) as f:
     settings = json.load(f)
 
 # Download and unpack the dataset to
-destination_folderpath = 'raw_data'
-retrieve(repo_url + file_url, destination_folderpath)
+retrieve(settings['source_path'], settings['raw_folderpath'])
 print('Raw data files were successfully retrieved.')
-
-# Process a single file
-data = summarize(os.path.join(destination_folderpath, 'nyt1.csv'))
 
 # Traverse raw data files
 summary_data = dict()
 summary_data.setdefault('CTR', np.empty(31))
 summary_data.setdefault('Clicks', np.empty(31))
 
-traverse(destination_folderpath, select_stats_unregistered)
+traverse(settings['raw_folderpath'], select_stats_unregistered)
 print('Raw data files were successfully processed.')
 
 # Make plots of CTR and total clicks over time
@@ -66,4 +62,4 @@ df['Clicks'].plot(
 plt.show()
 
 # Save processed results
-traverse('raw_data', save_stats)
+traverse(settings['raw_folderpath'], save_stats)
