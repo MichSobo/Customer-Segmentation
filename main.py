@@ -31,7 +31,7 @@ with open(config_filepath) as f:
     settings = json.load(f)
 
 # Download and unpack the dataset to
-retrieve(settings['source_path'], settings['raw_folderpath'])
+retrieve(settings)
 print('Raw data files were successfully retrieved.')
 
 # Traverse raw data files

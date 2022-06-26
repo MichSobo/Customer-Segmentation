@@ -1,5 +1,7 @@
 {
   "source_path": "https://github.com/oreillymedia/doing_data_science/raw/master/dds_datasets.zip",
   "raw_folderpath": "raw_data",
-  "results_folderpath": "results"
+  "results_folderpath": "results",
+  "unpacked_foldername": "dds_datasets",
+  "unpacked_zip_filename": "dds_ch2_nyt.zip"
 }
