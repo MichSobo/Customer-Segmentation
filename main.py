@@ -24,8 +24,8 @@ def save_stats(df, file_num):
     df.to_parquet(os.path.join(settings['results_folderpath'], target_filename))
 
 
-# Get command-line options
 if len(sys.argv) > 1:
+    # Get command-line options
     parser = argparse.ArgumentParser(
         description='Get some customer data and process it.'
     )
@@ -36,7 +36,14 @@ if len(sys.argv) > 1:
                         help='action to run (default: all)')
     args = parser.parse_args()
 
-config_filepath = 'config.json'
+    config_filepath = args.config
+    run_option = args.option
+else:
+    # Set a default path to the configuration file
+    config_filepath = 'config.json'
+
+    # Set run options to all by default
+    run_option = 'all'
 
 # Read configuration file
 global settings
@@ -49,36 +56,40 @@ os.makedirs(settings['raw_folderpath'], exist_ok=True)
 # Create results folder if not exists
 os.makedirs(settings['results_folderpath'], exist_ok=True)
 
-# Download and unpack the dataset to
-retrieve(settings)
-print('Raw data files were successfully retrieved.')
+if run_option in ('retrieve', 'all'):
+    # Download and unpack the dataset to
+    retrieve(settings)
+    print('Raw data files were successfully retrieved.')
 
-# Traverse raw data files
-summary_data = dict()
-summary_data.setdefault('CTR', np.empty(31))
-summary_data.setdefault('Clicks', np.empty(31))
+if run_option in ('visualize', 'all'):
+    # Traverse raw data files
+    summary_data = dict()
+    summary_data.setdefault('CTR', np.empty(31))
+    summary_data.setdefault('Clicks', np.empty(31))
 
-traverse(settings['raw_folderpath'], select_stats_unregistered)
-print('Raw data files were successfully processed.')
+    traverse(settings['raw_folderpath'], select_stats_unregistered)
+    print('Raw data files were successfully processed.')
 
-# Make plots of CTR and total clicks over time
-df = pd.DataFrame(summary_data)
 
-fix, ax = plt.subplots(nrows=2, ncols=1)
+    # Make plots of CTR and total clicks over time
+    df = pd.DataFrame(summary_data)
 
-df['CTR'].plot(
-    title='Click-through rate over one month',
-    ax=ax[0],
-    figsize=(8, 9),
-    xticks=[]
-)
-df['Clicks'].plot(
-    title='Total clicks over one month',
-    ax=ax[1],
-    figsize=(8, 9),
-    xticks=range(0, 31, 2)
-)
-plt.show()
+    fix, ax = plt.subplots(nrows=2, ncols=1)
 
-# Save processed results
-traverse(settings['raw_folderpath'], save_stats)
+    df['CTR'].plot(
+        title='Click-through rate over one month',
+        ax=ax[0],
+        figsize=(8, 9),
+        xticks=[]
+    )
+    df['Clicks'].plot(
+        title='Total clicks over one month',
+        ax=ax[1],
+        figsize=(8, 9),
+        xticks=range(0, 31, 2)
+    )
+    plt.show()
+
+if run_option in ('save', 'all'):
+    # Save processed results
+    traverse(settings['raw_folderpath'], save_stats)
