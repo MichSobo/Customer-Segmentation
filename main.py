@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 sys.path.append(os.path.abspath('scripts'))
 
 import numpy as np
@@ -19,26 +20,32 @@ def save_stats(df, file_num):
     target_filename = 'nyt_summary_' + str(file_num + 1) + '.parquet'
 
     df.columns = ['_'.join(column).rstrip('_') for column in df.columns.values]
-    df.to_parquet(os.path.join('results', target_filename))
+    df.to_parquet(os.path.join(settings['results_folderpath'], target_filename))
 
 
-repo_url = 'https://github.com/oreillymedia/doing_data_science/'
-file_url = 'raw/master/dds_datasets.zip'
+config_filepath = 'config.json'
+
+# Read configuration file
+global settings
+with open(config_filepath) as f:
+    settings = json.load(f)
+
+# Create raw data folder if not exists
+os.makedirs(settings['raw_folderpath'], exist_ok=True)
+
+# Create results folder if not exists
+os.makedirs(settings['results_folderpath'], exist_ok=True)
 
 # Download and unpack the dataset to
-destination_folderpath = 'raw_data'
-retrieve(repo_url + file_url, destination_folderpath)
+retrieve(settings)
 print('Raw data files were successfully retrieved.')
-
-# Process a single file
-data = summarize(os.path.join(destination_folderpath, 'nyt1.csv'))
 
 # Traverse raw data files
 summary_data = dict()
 summary_data.setdefault('CTR', np.empty(31))
 summary_data.setdefault('Clicks', np.empty(31))
 
-traverse(destination_folderpath, select_stats_unregistered)
+traverse(settings['raw_folderpath'], select_stats_unregistered)
 print('Raw data files were successfully processed.')
 
 # Make plots of CTR and total clicks over time
@@ -61,4 +68,4 @@ df['Clicks'].plot(
 plt.show()
 
 # Save processed results
-traverse('raw_data', save_stats)
+traverse(settings['raw_folderpath'], save_stats)

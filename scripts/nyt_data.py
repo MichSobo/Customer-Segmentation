@@ -1,4 +1,5 @@
 import io
+import os
 import sys
 import shutil
 import pathlib
@@ -12,29 +13,30 @@ if sys.version_info > (3, 7):
 else:
     import zipfile37 as zipfile
 
-unpacked_foldername = '/dds_datasets/'
-unpacked_zip_filename = 'dds_ch2_nyt.zip'
 
-
-def retrieve(source_filepath, destination_folderpath):
+def retrieve(settings):
     """Download dataset and unpack it."""
 
     def cleanup():
         try:
-            shutil.rmtree(destination_folderpath + unpacked_foldername)
+            shutil.rmtree(os.path.join(
+                settings['raw_folderpath'], settings['unpacked_foldername'])
+            )
         except OSError as e:
             print(f'Folder: {e.filename}, Error: {e.strerror}')
 
-    r = requests.get(source_filepath)
+    r = requests.get(settings['source_path'])
     assert r.status_code == requests.codes.ok
 
     z = zipfile.ZipFile(io.BytesIO(r.content))
-    z.extractall(destination_folderpath)
+    z.extractall(settings['raw_folderpath'])
 
     # The top archive contains another ZIP file with data
-    z = zipfile.ZipFile(
-        destination_folderpath + unpacked_foldername + unpacked_zip_filename)
-    z.extractall(destination_folderpath)
+    top_zip_filepath = os.path.join(
+        settings['raw_folderpath'], settings['unpacked_foldername'],
+        settings['unpacked_zip_filename'])
+    z = zipfile.ZipFile(top_zip_filepath)
+    z.extractall(settings['raw_folderpath'])
 
     # Remove temporary folder
     cleanup()
