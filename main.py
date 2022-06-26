@@ -41,14 +41,15 @@ retrieve(settings)
 print('Raw data files were successfully retrieved.')
 
 # Traverse raw data files
+summary_data = dict()
+summary_data.setdefault('CTR', np.empty(31))
+summary_data.setdefault('Clicks', np.empty(31))
+
 traverse(settings['raw_folderpath'], select_stats_unregistered)
 print('Raw data files were successfully processed.')
 
 # Make plots of CTR and total clicks over time
-df = pd.DataFrame({
-    'CTR': np.empty(31),
-    'Clicks': np.empty(31)
-})
+df = pd.DataFrame(summary_data)
 
 fix, ax = plt.subplots(nrows=2, ncols=1)
 
